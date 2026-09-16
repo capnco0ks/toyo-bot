@@ -1,0 +1,9 @@
+services:
+  toyo_bot:
+    build: .
+    container_name: toyo_wholesale_bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data

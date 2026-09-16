@@ -1,0 +1,26 @@
+# Environment variables (contains bot tokens and secrets)
+.env
+
+# Python cache & virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
