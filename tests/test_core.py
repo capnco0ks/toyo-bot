@@ -332,14 +332,19 @@ async def test_order_status_workflow(test_session: AsyncSession):
     assert order.status == "new"
 
     # Manager accepts order
-    await order_service.update_order_status(order.id, "accepted")
+    await order_service.update_order_status(
+        order.id, "accepted", accepted_by_id=777888, accepted_by_name="@alex_manager"
+    )
     o_accepted = await order_service.get_order_by_id(order.id)
     assert o_accepted.status == "accepted"
+    assert o_accepted.accepted_by_id == 777888
+    assert o_accepted.accepted_by_name == "@alex_manager"
 
     # Manager completes order
     await order_service.update_order_status(order.id, "completed")
     o_comp = await order_service.get_order_by_id(order.id)
     assert o_comp.status == "completed"
+    assert o_comp.accepted_by_id == 777888
 
 
 @pytest.mark.asyncio
@@ -378,3 +383,8 @@ def test_formatters():
     assert format_currency(8500.0) == "8 500 ₸"
     assert "НОВЫЙ" in format_status("new")
     assert "ПРИНЯТ" in format_status("accepted")
+
+    from app.database.models import Product
+    prod = Product(name="TOYO 5W-30", volume="4 л", package="металл", price=12500)
+    assert prod.full_title == "TOYO 5W-30 4 л (металл)"
+

@@ -105,6 +105,16 @@ class Product(Base):
         "CartItem", back_populates="product", cascade="all, delete-orphan"
     )
 
+    @property
+    def full_title(self) -> str:
+        """Name with volume and package, e.g. 'TOYO 5W30 4 л (металл)'."""
+        title = self.name or ""
+        if self.volume and self.volume not in title:
+            title = f"{title} {self.volume}"
+        if self.package and self.package not in title:
+            title = f"{title} ({self.package})"
+        return title.strip()
+
 
 class CartItem(Base):
     __tablename__ = "cart_items"
@@ -143,6 +153,10 @@ class Order(Base):
     phone: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     city: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
     delivery_address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Manager who accepted the order (only they or an admin may complete it)
+    accepted_by_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
+    accepted_by_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utc_now, index=True

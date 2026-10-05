@@ -23,8 +23,16 @@ class OrderService:
         total_pages = max(1, (total_count + page_size - 1) // page_size)
         return orders, total_count, total_pages
 
-    async def update_order_status(self, order_id: int, status: str) -> Optional[Order]:
-        return await self.repo.update_status(order_id, status)
+    async def update_order_status(
+        self,
+        order_id: int,
+        status: str,
+        accepted_by_id: Optional[int] = None,
+        accepted_by_name: Optional[str] = None,
+    ) -> Optional[Order]:
+        return await self.repo.update_status(
+            order_id, status, accepted_by_id=accepted_by_id, accepted_by_name=accepted_by_name
+        )
 
     async def get_stats(self) -> Dict[str, Any]:
         return await self.repo.get_stats()

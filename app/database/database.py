@@ -55,6 +55,8 @@ def _migrate_sqlite_columns_sync(connection):
         "phone": "VARCHAR(64)",
         "city": "VARCHAR(128)",
         "delivery_address": "TEXT",
+        "accepted_by_id": "BIGINT",
+        "accepted_by_name": "VARCHAR(255)",
     }
 
     # Check users table

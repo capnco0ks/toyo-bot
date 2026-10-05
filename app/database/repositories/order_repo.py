@@ -37,7 +37,7 @@ class OrderRepository:
             prod = ci.product
             # Check price snapshot
             price = prod.price if prod else 0.0
-            prod_name = prod.name if prod else "Товар удален"
+            prod_name = prod.full_title if prod else "Товар удален"
             item_total = price * ci.quantity
             total_amount += item_total
 
@@ -99,10 +99,20 @@ class OrderRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one() or 0
 
-    async def update_status(self, order_id: int, status: str) -> Optional[Order]:
+    async def update_status(
+        self,
+        order_id: int,
+        status: str,
+        accepted_by_id: Optional[int] = None,
+        accepted_by_name: Optional[str] = None,
+    ) -> Optional[Order]:
         order = await self.get_order_by_id(order_id)
         if order:
             order.status = status
+            if accepted_by_id is not None:
+                order.accepted_by_id = accepted_by_id
+            if accepted_by_name is not None:
+                order.accepted_by_name = accepted_by_name
             await self.session.commit()
             await self.session.refresh(order)
         return order

@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
+from app.config import settings
 from app.database.models import Product, Order, OrderItem, User
 
 
@@ -27,9 +28,13 @@ def format_status(status: str) -> str:
 def format_date(dt: datetime, include_time: bool = True) -> str:
     if not dt:
         return ""
+    local_dt = dt
+    tz_offset = getattr(settings, "TZ_OFFSET_HOURS", 5)
+    if tz_offset:
+        local_dt = dt + timedelta(hours=tz_offset)
     if include_time:
-        return dt.strftime("%d.%m.%Y %H:%M")
-    return dt.strftime("%d.%m.%Y")
+        return local_dt.strftime("%d.%m.%Y %H:%M")
+    return local_dt.strftime("%d.%m.%Y")
 
 
 def format_product_card(product: Product, quantity: int = 1) -> str:
@@ -67,7 +72,7 @@ def format_cart_text(items: list, total_amount: float, total_count: int, total_p
     lines = ["🛒 <b>Ваша корзина</b>\n"]
     for i, item in enumerate(items, 1):
         prod = item.product
-        prod_name = prod.name if prod else "Товар"
+        prod_name = prod.full_title if prod else "Товар"
         price = prod.price if prod else 0
         subtotal = price * item.quantity
         lines.append(
@@ -124,7 +129,7 @@ def format_checkout_preview(
     ]
     for i, item in enumerate(items, 1):
         prod = item.product
-        prod_name = prod.name if prod else "Товар"
+        prod_name = prod.full_title if prod else "Товар"
         price = prod.price if prod else 0
         subtotal = price * item.quantity
         lines.append(
